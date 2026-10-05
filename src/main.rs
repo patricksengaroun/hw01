@@ -33,8 +33,15 @@ fn read_number() -> u32 {
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Failed to read line");
-
     input.trim().parse::<u32>().unwrap_or(0)
+}
+
+
+fn roll_die() -> u32 {
+    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let roll = (start % 6) + 1;
+    println!("You rolled a: 🎲 {}", roll);
+    roll as u32
 }
 
 
@@ -44,5 +51,12 @@ fn main() {
 
 
     let choice = read_number();
-    println!("You selected option: {}", choice);
+    
+
+    if choice == 6{
+	roll_die();
+    } else {
+	println!("You selected option: {}", choice);
+    }
 }
+
