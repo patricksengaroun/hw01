@@ -1,3 +1,4 @@
+use std::io::{self, Write};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 
@@ -26,15 +27,22 @@ fn hunt_food() -> u32 {
 }
 
 
+fn read_number() -> u32 {
+    print!("Enter choice: ");
+    io::stdout().flush().unwrap();
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Failed to read line");
+
+    input.trim().parse::<u32>().unwrap_or(0)
+}
+
+
 fn main() {
     let mut cash = 400;
-    let mut food = 0;
-
-
     print_menu(cash);
-   
 
-    println!("\n[Testing Hunt]");
-    food += hunt_food();
-    println!("Total food stash: {} lbs", food);
+
+    let choice = read_number();
+    println!("You selected option: {}", choice);
 }
