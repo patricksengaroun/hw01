@@ -10,6 +10,7 @@ fn print_menu(cash: u32) {
     println!("3. Clothing  ($10)");
     println!("4. Ammo      ($2/box)");
     println!("5. Leave Post");
+    println!("6. Roll Multiple Dice");
     println!("===========================");
 }
 
@@ -30,7 +31,6 @@ fn hunt_food() -> u32 {
 fn read_number() -> u32 {
     print!("Enter choice: ");
     io::stdout().flush().unwrap();
-
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Failed to read line");
     input.trim().parse::<u32>().unwrap_or(0)
@@ -38,6 +38,7 @@ fn read_number() -> u32 {
 
 
 fn roll_die() -> u32 {
+    std::thread::sleep(std::time::Duration::from_nanos(1));
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
     let roll = (start % 6) + 1;
     println!("You rolled a: 🎲 {}", roll);
@@ -45,18 +46,49 @@ fn roll_die() -> u32 {
 }
 
 
+fn roll_many() -> u32 {
+    print!("How many dice would you like to roll?: ");
+    let count = read_number();
+    let mut total = 0;
+
+
+    for _ in 0..count {
+        total += roll_die();
+    }
+
+
+    println!("Total combined score: {}", total);
+    total
+}
+
+
 fn main() {
     let mut cash = 400;
     print_menu(cash);
 
-
+    print!("Enter choice: ");
     let choice = read_number();
     
 
-    if choice == 6{
-	roll_die();
-    } else {
-	println!("You selected option: {}", choice);
-    }
+    match choice {
+       1 => {
+           if can_afford(cash, 40) {
+               cash -= 40;
+               println!("You bought Oxen! Remaining cash: ${}", cash);
+           } else {
+               println!("You can't afford that!");
+           }
+       }
+       2 => println!("You selected Food."),
+       3 => println!("You selected Clothing."),
+       4 => println!("You selected Ammo."),
+       5 => {
+           hunt_food();
+       }
+       6 => {
+           roll_many();
+       }
+       _ => println!("Invalid option or leaving post."),
+   }
 }
 
