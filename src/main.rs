@@ -2,6 +2,14 @@ use std::io::{self, Write};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 
+struct Inventory {
+    cash: u32,
+    oxen: u32,
+    food: u32,
+    clothing: u32,
+    ammo: u32,
+}
+
 fn print_menu(cash: u32) {
     println!("=== PATRICK'S TRADING POST ===");
     println!("Cash Available: ${}", cash);
@@ -9,11 +17,24 @@ fn print_menu(cash: u32) {
     println!("2. Food      ($1/lb)");
     println!("3. Clothing  ($10)");
     println!("4. Ammo      ($2/box)");
-    println!("5. Leave Post");
+    println!("5. Hunt For Food");
     println!("6. Roll Multiple Dice");
+    println!("7. Check Inventory Status");
+    println!("8. Leave Post");
     println!("===========================");
 }
 
+fn print_status(inv: &Inventory) {
+    println!("\n==========================");
+    println!("      CURRENT STATUS      ");
+    println!("==========================");
+    println!("💰 Cash:     ${}", inv.cash);
+    println!("🐂 Oxen:     {} head", inv.oxen);
+    println!("🌾 Food:     {} lbs", inv.food);
+    println!("👕 Clothing: {} sets", inv.clothing);
+    println!("📦 Ammo:     {} boxes", inv.ammo);
+    println!("==========================");
+}
 
 fn can_afford(cash: u32, cost: u32) -> bool {
     cash >= cost
@@ -63,32 +84,74 @@ fn roll_many() -> u32 {
 
 
 fn main() {
-    let mut cash = 400;
-    print_menu(cash);
+    let mut player_inv = Inventory {
+        cash: 400,
+        oxen: 0,
+        food: 0,
+        clothing: 0,
+        ammo: 0,
+    };
 
-    print!("Enter choice: ");
-    let choice = read_number();
-    
 
-    match choice {
-       1 => {
-           if can_afford(cash, 40) {
-               cash -= 40;
-               println!("You bought Oxen! Remaining cash: ${}", cash);
-           } else {
-               println!("You can't afford that!");
-           }
-       }
-       2 => println!("You selected Food."),
-       3 => println!("You selected Clothing."),
-       4 => println!("You selected Ammo."),
-       5 => {
-           hunt_food();
-       }
-       6 => {
-           roll_many();
-       }
-       _ => println!("Invalid option or leaving post."),
-   }
+    loop {
+        print_menu(player_inv.cash);
+        print!("Enter choice: ");
+        let choice = read_number();
+
+        match choice {
+            1 => {
+                if can_afford(player_inv.cash, 40) {
+                    player_inv.cash -= 40;
+                    player_inv.oxen += 1;
+                    println!("Successfully purchased 1 Ox!");
+                } else {
+                    println!("You can't afford that!");
+                }
+            }
+            2 => {
+                print!("How many pounds of food? ($1/lb): ");
+                let amount = read_number();
+                if can_afford(player_inv.cash, amount) {
+                    player_inv.cash -= amount;
+                    player_inv.food += amount;
+                    println!("Successfully purchased {} lbs of food!", amount);
+                } else {
+                    println!("You can't afford that much food!");
+                }
+            }
+            3 => {
+                if can_afford(player_inv.cash, 10) {
+                    player_inv.cash -= 10;
+                    player_inv.clothing += 1;
+                    println!("Successfully purchased 1 Clothing set!");
+                } else {
+                    println!("You can't afford that!");
+                }
+            }
+            4 => {
+                if can_afford(player_inv.cash, 2) {
+                    player_inv.cash -= 2;
+                    player_inv.ammo += 1;
+                    println!("Successfully purchased 1 box of Ammo!");
+                } else {
+                    println!("You can't afford that!");
+                }
+            }
+            5 => {
+                let found = hunt_food();
+                player_inv.food += found;
+            }
+            6 => {
+                roll_many();
+            }
+            7 => {
+                print_status(&player_inv);
+            }
+            8 => {
+                println!("Goodbye, traveler! Good luck on the trail.");
+                break;
+            }
+            _ => println!("Invalid option. Please choose 1-8."),
+        }
+    }
 }
-
