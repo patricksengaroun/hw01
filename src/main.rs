@@ -12,7 +12,7 @@ const AMMO_PRICE: u64 = 2;
 
 
 struct Inventory {
-    gold: u64,
+    cash: u64,
     oxen: u64,
     food: u64,
     clothing: u64,
@@ -53,7 +53,7 @@ fn can_afford(cash: u64, cost: u64) -> bool {
 
 fn hunt_food() -> u64 {
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-    let food_found = (start % 41) + 10;
+    let food_found = ((start % 41) + 10) as u64;
     println!("You went hunting and brought back {} lbs of food!", food_found);
     food_found
 }
@@ -78,20 +78,20 @@ fn read_number() -> u64 {
     io::stdout().flush().unwrap();
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Failed to read line");
-    input.trim().parse::<u32>().unwrap_or(0)
+    input.trim().parse::<u64>().unwrap_or(0)
 }
 
 
 fn roll_die() -> u64 {
     std::thread::sleep(std::time::Duration::from_nanos(1));
     let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-    let roll = (start % 6) + 1;
+    let roll = ((start % 6) + 1) as u64;
     println!("You rolled a: 🎲 {}", roll);
     roll
 }
 
 
-fn roll_many() -> u32 {
+fn roll_many() -> u64 {
     print!("How many dice would you like to roll?: ");
     let count = read_number();
     let mut total = 0;
@@ -114,6 +114,8 @@ fn main() {
         food: 0,
         clothing: 0,
         ammo: 0,
+	day: 0,
+	roll_count: 0,
     };
 
 
